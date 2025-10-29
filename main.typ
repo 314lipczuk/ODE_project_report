@@ -79,8 +79,9 @@ Sustained and Ramp were incorporated as a means of providing cross-validation fo
 == The chosen model
 
 Finding the balance between simplicity and mechanistic accuracy is the key problem in model definition. 
-Too simple, and the results are not meaningful in real life ....
-Too complex, and we risk overfitting, parameter non-identifiability, and fragility towards biased data
+Too simple model results in non-relevant findings, since it fails to capture complexity of the problem.
+Too complex model is harder to operate, and is prone to fragile to comlexity explosions,
+parameter unidentifiability, and poor choice of starting condition leading to nonsensical results.
 #figure(
   diagram(
     spacing: 4em,
@@ -88,19 +89,19 @@ Too complex, and we risk overfitting, parameter non-identifiability, and fragili
     // === SPECIES NODES (top → bottom) ===
     node((0,  0.0), [Light], name: <light>),
 
-    node((0,  1.5), [RAS_s], name: <ras_s>),
+    node((0,  1.5), [RAS\*], name: <ras_s>),
     node((2.0, 1.5), [RAS],  name: <ras>),
 
-    node((0,  3.0), [RAF_s], name: <raf_s>),
+    node((0,  3.0), [RAF\*], name: <raf_s>),
     node((-2.0, 3.0), [RAF],  name: <raf>),
 
-    node((0,  4.5), [MEK_s], name: <mek_s>),
+    node((0,  4.5), [MEK\*], name: <mek_s>),
     node((2.0, 4.5), [MEK],  name: <mek>),
 
-    node((-2,  6.0), [ERK_s], name: <erk_s>),
+    node((-2,  6.0), [ERK\*], name: <erk_s>),
     node((0, 6.0), [ERK],  name: <erk>),
 
-    node((-2.0, 4.5), [NFB_s], name: <nfb_s>),
+    node((-2.0, 4.5), [NFB\*], name: <nfb_s>),
     node((-4.0, 4.5), [NFB],   name: <nfb>),
 
     // === INVISIBLE REACTION NODES (for regulatory targeting only) ===
@@ -136,7 +137,7 @@ Too complex, and we risk overfitting, parameter non-identifiability, and fragili
     edge(<nfb_s>, <nfb>, "-|>", [f21], bend: -25deg),
 
     // === REGULATION (external effects aimed at invisible nodes) ===
-    edge(<light>, <rxn_ras>, "-|>", [light], bend: 50deg),
+    edge(<light>, <rxn_ras>, "-|>", [], bend: 50deg),
     edge(<nfb_s>, <rxn_raf>, "-|>", [knfb], bend: -40deg),
     edge(<erk_s>, <rxn_nfb>, "-|>", [], bend: 25deg),
 
@@ -148,6 +149,18 @@ Too complex, and we risk overfitting, parameter non-identifiability, and fragili
   ),
 caption: [Diagram of the used model, representing simplified MAPK/ERK cascade. ]
 )
+
+Our chosen model starts at the level of RAS, and does not include the receptor layer. It treats light as a positive term in converting
+RAS to RAS\*. The standard MAPK/ERK cascade of RAS-RAF-MEK-ERK is preserved 
+We group whole families of kinases together and represent them as one vertex to preserve ontological
+grouping while minimising complexity of the model.
+Model also contains a negative feelback loop represented as a seperate NFB vertex in above graph. 
+Modeling negative feedback as a separate state variable is not mechanistically accurate, but allows for a number of useful properties.
+It helps with model understandability, as negative feedback has clear and separate parameters that can be tweaked in isolation, while 
+its existance as a state variable in the simulated model helps to track the contribution of negative feedback on the rest of the system.
+Another remarkable simplification of experimental setup comes from removal of reporter later (KTR-ERK complex). 
+Presented model assumes that gathered experimental data coming from the reporter is a perfect proxy of actual 
+state of ERK concentration in the cell.
 
 == Ordinary Differential Equations
 
