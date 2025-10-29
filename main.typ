@@ -78,146 +78,76 @@ Sustained and Ramp were incorporated as a means of providing cross-validation fo
 
 == The chosen model
 
-Finding the brlance between simplicity and accuracy is the key problem in model definition. 
+Finding the balance between simplicity and mechanistic accuracy is the key problem in model definition. 
 Too simple, and the results are not meaningful in real life ....
 Too complex, and we risk overfitting, parameter non-identifiability, and fragility towards biased data
+#figure(
+  diagram(
+    spacing: 4em,
 
+    // === SPECIES NODES (top → bottom) ===
+    node((0,  0.0), [Light], name: <light>),
 
+    node((0,  1.5), [RAS_s], name: <ras_s>),
+    node((2.0, 1.5), [RAS],  name: <ras>),
 
-#diagram(
-  spacing: 4em,
+    node((0,  3.0), [RAF_s], name: <raf_s>),
+    node((-2.0, 3.0), [RAF],  name: <raf>),
 
-  // === Nodes (top → bottom) ===
-  node((0,  0.0), [Light], name: <light>),
+    node((0,  4.5), [MEK_s], name: <mek_s>),
+    node((2.0, 4.5), [MEK],  name: <mek>),
 
-  // RAS level
-  node((0,  1.5), [RAS_s], name: <ras_s>),
-  node((2.0, 1.5), [RAS],  name: <ras>),
+    node((-2,  6.0), [ERK_s], name: <erk_s>),
+    node((0, 6.0), [ERK],  name: <erk>),
 
-  // RAF level
-  node((0,  3.0), [RAF_s], name: <raf_s>),
-  node((2.0, 3.0), [RAF],  name: <raf>),
+    node((-2.0, 4.5), [NFB_s], name: <nfb_s>),
+    node((-4.0, 4.5), [NFB],   name: <nfb>),
 
-  // MEK level (and NFB same level)
-  node((0,  4.5),  [MEK_s], name: <mek_s>),
-  node((2.0, 4.5), [MEK],   name: <mek>),
-  node((-2.0, 4.5), [NFB_s], name: <nfb_s>),
-  node((-4.0, 4.5), [NFB],   name: <nfb>),
+    // === INVISIBLE REACTION NODES (for regulatory targeting only) ===
+    node((1.0, 0.9), [], name: <rxn_ras>),
+    node((-1.0, 3.55), [], name: <rxn_raf>),
+    node((-0.95, 2.4), [], name: <rxn_raf2>),
+    node((1.0, 3.9), [], name: <rxn_mek>),
+    node((-1.0, 5.4), [], name: <rxn_erk>),
+    node((-3.0, 5.1), [], name: <rxn_nfb>),
 
-  // ERK level (below MEK/NFB)
-  node((0,  6.0), [ERK_s], name: <erk_s>),
-  node((2.0, 6.0), [ERK],  name: <erk>),
+    // === MAIN DOWNWARD CASCADE ===
+    //edge(<light>,  <ras_s>, "-|>", [light]),
+    edge(<ras_s>,  <rxn_raf2>, "-|>", [], bend:-25deg),
+    edge(<raf_s>,  <rxn_mek>, "-|>", [], bend:25deg),
+    edge(<mek_s>,  <rxn_erk>, "-|>", [], bend:-25deg),
+    //edge(<erk_s>,  <nfb_s>, "-|>", [], bend: -25deg),
 
-  // === Edges ===
-  // Main downward activation cascade
-  edge(<light>,  <ras_s>, "-|>", [light]),
-  edge(<ras_s>,  <raf_s>, "-|>", [k34]),
-  edge(<raf_s>,  <mek_s>, "-|>", [k56]),
-  edge(<mek_s>,  <erk_s>, "-|>", [k78]),
+    // === STANDARD BIDIRECTIONAL LINKS FOR EACH PAIR ===
+    // RAS
+    edge(<ras>, <ras_s>, "-|>", [k12], bend: -25deg),
+    edge(<ras_s>, <ras>, "-|>", [k21], bend: -25deg),
+    // RAF
+    edge(<raf>, <raf_s>, "-|>", [k34], bend: 25deg),
+    edge(<raf_s>, <raf>, "-|>", [k43], bend: 25deg),
+    // MEK
+    edge(<mek>, <mek_s>, "-|>", [k56], bend: -25deg),
+    edge(<mek_s>, <mek>, "-|>", [k65], bend: -25deg),
+    // ERK
+    edge(<erk>, <erk_s>, "-|>", [k78], bend: -25deg),
+    edge(<erk_s>, <erk>, "-|>", [k87], bend: -25deg),
+    // NFB
+    edge(<nfb>, <nfb_s>, "-|>", [f12], bend: -25deg),
+    edge(<nfb_s>, <nfb>, "-|>", [f21], bend: -25deg),
 
-  // ERK_s activates NFB_s (NFB same level as MEK)
-  edge(<erk_s>, <nfb_s>, "-|>", [f12], bend: -25deg),
+    // === REGULATION (external effects aimed at invisible nodes) ===
+    edge(<light>, <rxn_ras>, "-|>", [light], bend: 50deg),
+    edge(<nfb_s>, <rxn_raf>, "-|>", [knfb], bend: -40deg),
+    edge(<erk_s>, <rxn_nfb>, "-|>", [], bend: 25deg),
 
-  // Feedback inhibition NFB_s → RAF_s
-  edge(<nfb_s>, <raf_s>, "-|>", [knfb], bend: -20deg),
-
-  // === Bidirectional active ↔ inactive edges (with curved bends) ===
-  // RAS
-  edge(<ras>, <ras_s>, "-|>", [k12], bend: 25deg),
-  edge(<ras_s>, <ras>, "-|>", [k21], bend: 25deg),
-  // RAF
-  edge(<raf>, <raf_s>, "-|>", [k34], bend: 25deg),
-  edge(<raf_s>, <raf>, "-|>", [k43], bend: 25deg),
-  // MEK
-  edge(<mek>, <mek_s>, "-|>", [k56], bend: 25deg),
-  edge(<mek_s>, <mek>, "-|>", [k65], bend: 25deg),
-  // ERK
-  edge(<erk>, <erk_s>, "-|>", [k78], bend: 25deg),
-  edge(<erk_s>, <erk>, "-|>", [k87], bend: 25deg),
-  // NFB
-  edge(<nfb>, <nfb_s>, "-|>", [f12], bend: 25deg),
-  edge(<nfb_s>, <nfb>, "-|>", [f21], bend: 25deg),
-
-  // === Styling ===
-  node-stroke: 0.9pt,
-  edge-stroke: 0.9pt,
-  label-size: 9pt,
+    // === STYLING ===
+    node-stroke: 0.9pt,
+    edge-stroke: 0.9pt,
+    label-size: 9pt,
+    node-fill: none,
+  ),
+caption: [Diagram of the used model, representing simplified MAPK/ERK cascade. ]
 )
-
-#import"@preview/fletcher:0.5.8": diagram, node, edge
-
-#diagram(
-  spacing: 4em,
-
-  // === SPECIES NODES (top → bottom) ===
-  node((0,  0.0), [Light], name: <light>),
-
-  node((0,  1.5), [RAS_s], name: <ras_s>),
-  node((2.0, 1.5), [RAS],  name: <ras>),
-
-  node((0,  3.0), [RAF_s], name: <raf_s>),
-  node((-2.0, 3.0), [RAF],  name: <raf>),
-
-  node((0,  4.5), [MEK_s], name: <mek_s>),
-  node((2.0, 4.5), [MEK],  name: <mek>),
-
-  node((-2,  6.0), [ERK_s], name: <erk_s>),
-  node((0, 6.0), [ERK],  name: <erk>),
-
-  node((-2.0, 4.5), [NFB_s], name: <nfb_s>),
-  node((-4.0, 4.5), [NFB],   name: <nfb>),
-
-  // === INVISIBLE REACTION NODES (for regulatory targeting only) ===
-  node((1.0, 0.9), [], name: <rxn_ras>),
-  node((-1.1, 2.4), [], name: <rxn_raf>),
-  node((-0.95, 2.4), [], name: <rxn_raf2>),
-  node((1.0, 3.9), [], name: <rxn_mek>),
-  node((-1.0, 5.4), [], name: <rxn_erk>),
-  node((-3.0, 5.1), [], name: <rxn_nfb>),
-
-  // === MAIN DOWNWARD CASCADE ===
-  //edge(<light>,  <ras_s>, "-|>", [light]),
-  edge(<ras_s>,  <rxn_raf2>, "-|>", [k34], bend:-25deg),
-  edge(<raf_s>,  <rxn_mek>, "-|>", [k56], bend:25deg),
-  edge(<mek_s>,  <rxn_erk>, "-|>", [k78], bend:-25deg),
-  //edge(<erk_s>,  <nfb_s>, "-|>", [f12], bend: -25deg),
-
-  // === STANDARD BIDIRECTIONAL LINKS FOR EACH PAIR ===
-  // RAS
-  edge(<ras>, <ras_s>, "-|>", [k12], bend: 25deg),
-  edge(<ras_s>, <ras>, "-|>", [k21], bend: 25deg),
-  // RAF
-  edge(<raf>, <raf_s>, "-|>", [k34], bend: 25deg),
-  edge(<raf_s>, <raf>, "-|>", [k43], bend: 25deg),
-  // MEK
-  edge(<mek>, <mek_s>, "-|>", [k56], bend: 25deg),
-  edge(<mek_s>, <mek>, "-|>", [k65], bend: 25deg),
-  // ERK
-  edge(<erk>, <erk_s>, "-|>", [k78], bend: 25deg),
-  edge(<erk_s>, <erk>, "-|>", [k87], bend: 25deg),
-  // NFB
-  edge(<nfb>, <nfb_s>, "-|>", [f12], bend: -25deg),
-  edge(<nfb_s>, <nfb>, "-|>", [f21], bend: -25deg),
-
-  // === REGULATION (external effects aimed at invisible nodes) ===
-  edge(<light>, <rxn_ras>, "-|>", [light], bend: 50deg),
-  edge(<nfb_s>, <rxn_raf>, "-|>", [knfb], bend: 90deg),
-  edge(<erk_s>, <rxn_nfb>, "-|>", [f12], bend: 25deg),
-
-  // === STYLING ===
-  node-stroke: 0.9pt,
-  edge-stroke: 0.9pt,
-  label-size: 9pt,
-  node-fill: none,
-)
-
-
-
-
-
-
-
-
 
 == Ordinary Differential Equations
 
