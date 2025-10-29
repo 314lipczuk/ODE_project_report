@@ -144,69 +144,65 @@ Too complex, and we risk overfitting, parameter non-identifiability, and fragili
   label-size: 9pt,
 )
 
-#import "@preview/fletcher:0.5.8": diagram, node, edge
+#import"@preview/fletcher:0.5.8": diagram, node, edge
 
 #diagram(
   spacing: 4em,
 
-  // === MAIN SPECIES NODES ===
+  // === SPECIES NODES (top → bottom) ===
   node((0,  0.0), [Light], name: <light>),
 
-  // RAS
   node((0,  1.5), [RAS_s], name: <ras_s>),
   node((2.0, 1.5), [RAS],  name: <ras>),
 
-  // RAF
   node((0,  3.0), [RAF_s], name: <raf_s>),
-  node((2.0, 3.0), [RAF],  name: <raf>),
+  node((-2.0, 3.0), [RAF],  name: <raf>),
 
-  // MEK
   node((0,  4.5), [MEK_s], name: <mek_s>),
   node((2.0, 4.5), [MEK],  name: <mek>),
 
-  // ERK
-  node((0,  6.0), [ERK_s], name: <erk_s>),
-  node((2.0, 6.0), [ERK],  name: <erk>),
+  node((-2,  6.0), [ERK_s], name: <erk_s>),
+  node((0, 6.0), [ERK],  name: <erk>),
 
-  // NFB (side branch, same height as MEK)
   node((-2.0, 4.5), [NFB_s], name: <nfb_s>),
   node((-4.0, 4.5), [NFB],   name: <nfb>),
 
-  // === INVISIBLE REGULATORY VERTICES (reaction anchors) ===
-  node((1.0, 1.3), [], name: <rxn_ras>),
-  node((1.0, 2.8), [], name: <rxn_raf>),
-  node((-3.0, 4.3), [], name: <rxn_nfb>),
+  // === INVISIBLE REACTION NODES (for regulatory targeting only) ===
+  node((1.0, 0.9), [], name: <rxn_ras>),
+  node((-1.1, 2.4), [], name: <rxn_raf>),
+  node((-0.95, 2.4), [], name: <rxn_raf2>),
+  node((1.0, 3.9), [], name: <rxn_mek>),
+  node((-1.0, 5.4), [], name: <rxn_erk>),
+  node((-3.0, 5.1), [], name: <rxn_nfb>),
 
-  // === MAIN SIGNALING CASCADE ===
-  edge(<light>,  <ras_s>, "-|>", [light]),
-  edge(<ras_s>,  <raf_s>, "-|>", [k34]),
-  edge(<raf_s>,  <mek_s>, "-|>", [k56]),
-  edge(<mek_s>,  <erk_s>, "-|>", [k78]),
-  edge(<erk_s>,  <nfb_s>, "-|>", [f12], bend: -25deg),
+  // === MAIN DOWNWARD CASCADE ===
+  //edge(<light>,  <ras_s>, "-|>", [light]),
+  edge(<ras_s>,  <rxn_raf2>, "-|>", [k34], bend:-25deg),
+  edge(<raf_s>,  <rxn_mek>, "-|>", [k56], bend:25deg),
+  edge(<mek_s>,  <rxn_erk>, "-|>", [k78], bend:-25deg),
+  //edge(<erk_s>,  <nfb_s>, "-|>", [f12], bend: -25deg),
 
-  // === STANDARD BIDIRECTIONAL LINKS (MEK, ERK) ===
-  edge(<mek>, <mek_s>, "-|>", [k56], bend: 25deg),
-  edge(<mek_s>, <mek>, "-|>", [k65], bend: 25deg),
-  edge(<erk>, <erk_s>, "-|>", [k78], bend: 25deg),
-  edge(<erk_s>, <erk>, "-|>", [k87], bend: 25deg),
-
-  // === BIDIRECTIONAL LINKS FOR RAS, RAF, NFB (as before) ===
+  // === STANDARD BIDIRECTIONAL LINKS FOR EACH PAIR ===
+  // RAS
   edge(<ras>, <ras_s>, "-|>", [k12], bend: 25deg),
   edge(<ras_s>, <ras>, "-|>", [k21], bend: 25deg),
+  // RAF
   edge(<raf>, <raf_s>, "-|>", [k34], bend: 25deg),
   edge(<raf_s>, <raf>, "-|>", [k43], bend: 25deg),
-  edge(<nfb>, <nfb_s>, "-|>", [f12], bend: 25deg),
-  edge(<nfb_s>, <nfb>, "-|>", [f21], bend: 25deg),
+  // MEK
+  edge(<mek>, <mek_s>, "-|>", [k56], bend: 25deg),
+  edge(<mek_s>, <mek>, "-|>", [k65], bend: 25deg),
+  // ERK
+  edge(<erk>, <erk_s>, "-|>", [k78], bend: 25deg),
+  edge(<erk_s>, <erk>, "-|>", [k87], bend: 25deg),
+  // NFB
+  edge(<nfb>, <nfb_s>, "-|>", [f12], bend: -25deg),
+  edge(<nfb_s>, <nfb>, "-|>", [f21], bend: -25deg),
 
-  // === REGULATORY CONNECTIONS (pointing to reaction vertices) ===
-  // NFB_s inhibits RAF activation → goes to rxn_raf
-  edge(<nfb_s>, <rxn_raf>, "-|>", [knfb], bend: 25deg),
-
-  // ERK_s activates NFB activation → goes to rxn_nfb
+  // === REGULATION (external effects aimed at invisible nodes) ===
+  edge(<light>, <rxn_ras>, "-|>", [light], bend: 50deg),
+  edge(<nfb_s>, <rxn_raf>, "-|>", [knfb], bend: 90deg),
   edge(<erk_s>, <rxn_nfb>, "-|>", [f12], bend: 25deg),
-
-  // Light activates RAS activation → goes to rxn_ras
-  edge(<light>, <rxn_ras>, "-|>", [light], bend: 25deg),
 
   // === STYLING ===
   node-stroke: 0.9pt,
@@ -214,6 +210,7 @@ Too complex, and we risk overfitting, parameter non-identifiability, and fragili
   label-size: 9pt,
   node-fill: none,
 )
+
 
 
 
