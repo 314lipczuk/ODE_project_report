@@ -82,51 +82,72 @@ Finding the brlance between simplicity and accuracy is the key problem in model 
 Too simple, and the results are not meaningful in real life ....
 Too complex, and we risk overfitting, parameter non-identifiability, and fragility towards biased data
 
-#import "@preview/fletcher:0.5.8": diagram, node, edge
+
 
 #diagram(
-  // layout (left→right flow)
-  spacing: 4.5em,
+  spacing: 4em,
 
-  // --- nodes (give each a name so we can reference it in edges)
-  node((0, 0), [Light],  name: <light>),
-  node((0, 1), [RAS],    name: <ras>),
-  node((2, 0), [RAS_s],  name: <ras_s>),
+  // === Nodes (top → bottom) ===
+  node((0,  0.0), [Light], name: <light>),
 
-  node((3, 0), [RAF_s],  name: <raf_s>),
-  node((3,-1), [RAF],    name: <raf>),
+  // RAS level
+  node((0,  1.5), [RAS_s], name: <ras_s>),
+  node((2.0, 1.5), [RAS],  name: <ras>),
 
-  node((4, 0), [MEK_s],  name: <mek_s>),
-  node((4,-1), [MEK],    name: <mek>),
+  // RAF level
+  node((0,  3.0), [RAF_s], name: <raf_s>),
+  node((2.0, 3.0), [RAF],  name: <raf>),
 
-  node((5, 0), [ERK_s],  name: <erk_s>),
-  node((5,-1), [ERK],    name: <erk>),
+  // MEK level (and NFB same level)
+  node((0,  4.5),  [MEK_s], name: <mek_s>),
+  node((2.0, 4.5), [MEK],   name: <mek>),
+  node((-2.0, 4.5), [NFB_s], name: <nfb_s>),
+  node((-4.0, 4.5), [NFB],   name: <nfb>),
 
-  node((6, 0), [NFB_s],  name: <nfb_s>),
-  node((6,-1), [NFB],    name: <nfb>),
+  // ERK level (below MEK/NFB)
+  node((0,  6.0), [ERK_s], name: <erk_s>),
+  node((2.0, 6.0), [ERK],  name: <erk>),
 
-  // --- activation edges (positive terms)
-  edge(<light>,  <ras_s>, "-|>", [ light · RAS/(K12+RAS) ]),
-  edge(<ras_s>,  <raf_s>, "-|>", [ k34 · RAS_s · RAF/(K34+RAF) ]),
-  edge(<raf_s>,  <mek_s>, "-|>", [ k56 · RAF_s · MEK/(K56+MEK) ]),
-  edge(<mek_s>,  <erk_s>, "-|>", [ k78 · MEK_s · ERK/(K78+ERK) ]),
-  edge(<erk_s>,  <nfb_s>, "-|>", [ f12 · ERK_s · NFB/(F12+NFB) ]),
+  // === Edges ===
+  // Main downward activation cascade
+  edge(<light>,  <ras_s>, "-|>", [light]),
+  edge(<ras_s>,  <raf_s>, "-|>", [k34]),
+  edge(<raf_s>,  <mek_s>, "-|>", [k56]),
+  edge(<mek_s>,  <erk_s>, "-|>", [k78]),
 
-  // --- feedback from NFB_s to RAF_s (appears in RAF_s ODE as − knfb·NFB_s · ... )
-  edge(<nfb_s>, <raf_s>, "-|>", [ feedback (−knfb·NFB_s) ], bend: -25deg),
+  // ERK_s activates NFB_s (NFB same level as MEK)
+  edge(<erk_s>, <nfb_s>, "-|>", [f12], bend: -25deg),
 
-  // --- deactivation / export terms (negative terms to unphosphorylated pools)
-  edge(<ras_s>, <ras>, "-|>", [ −k21 · RAS_s/(K21+RAS_s) ], bend: 25deg),
-  edge(<raf_s>, <raf>, "-|>", [ −k43 · RAF_s/(K43+RAF_s)   ], bend: 25deg),
-  edge(<mek_s>, <mek>, "-|>", [ −k65 · MEK_s/(K65+MEK_s)   ], bend: 25deg),
-  edge(<erk_s>, <erk>, "-|>", [ −k87 · ERK_s/(K87+ERK_s)   ], bend: 25deg),
-  edge(<nfb_s>, <nfb>, "-|>", [ −f21 · NFB_s/(F21+NFB_s)   ], bend: 25deg),
+  // Feedback inhibition NFB_s → RAF_s
+  edge(<nfb_s>, <raf_s>, "-|>", [knfb], bend: -20deg),
 
-  // optional: small global styling tweaks
-  edge-stroke: 0.9pt,
+  // === Bidirectional active ↔ inactive edges (with curved bends) ===
+  // RAS
+  edge(<ras>, <ras_s>, "-|>", [k12], bend: 25deg),
+  edge(<ras_s>, <ras>, "-|>", [k21], bend: 25deg),
+  // RAF
+  edge(<raf>, <raf_s>, "-|>", [k34], bend: 25deg),
+  edge(<raf_s>, <raf>, "-|>", [k43], bend: 25deg),
+  // MEK
+  edge(<mek>, <mek_s>, "-|>", [k56], bend: 25deg),
+  edge(<mek_s>, <mek>, "-|>", [k65], bend: 25deg),
+  // ERK
+  edge(<erk>, <erk_s>, "-|>", [k78], bend: 25deg),
+  edge(<erk_s>, <erk>, "-|>", [k87], bend: 25deg),
+  // NFB
+  edge(<nfb>, <nfb_s>, "-|>", [f12], bend: 25deg),
+  edge(<nfb_s>, <nfb>, "-|>", [f21], bend: 25deg),
+
+  // === Styling ===
   node-stroke: 0.9pt,
+  edge-stroke: 0.9pt,
   label-size: 9pt,
 )
+
+
+
+
+
 
 
 == Ordinary Differential Equations
