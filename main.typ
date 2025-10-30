@@ -178,6 +178,17 @@ an ODE system by evaluating the equations sequentially at a consecutive `X-steps
 This method, while providing a weaker form of solution, can deal with harder problems,
 including those that describe complex, nonlinear systems.
 
+
+#block[
+  $
+    d(#"RAS_s")/d(t) = #"light" * (#"RAS" / (#"K_12" + #"RAS")) - #"k_21" * (#"RAS_s" / (#"K_21" + #"RAS_s")) \
+    d(#"RAF_s")/d(t) = #"k_34" * #"RAS_s" * (#"RAF" / (#"K_34" + #"RAF")) - (#"knfb" * #"NFB_s" + #"k_43") * (#"RAF_s" / (#"K_43" + #"RAF_s")) \
+    d(#"MEK_s")/d(t) = #"k_56" * #"RAF_s" * (#"MEK" / (#"K_56" + #"MEK")) - #"k_65" * (#"MEK_s" / (#"K_65" + #"MEK_s")) \
+    d(#"NFB_s")/d(t) = #"f_12" * #"ERK_s" * (#"NFB" / (#"F_12" + #"NFB")) - #"f_21" * (#"NFB_s" / (#"F_21" + #"NFB_s")) \
+    d(#"ERK_s")/d(t) = #"k_78" * #"MEK_s" * (#"ERK" / (#"K_78" + #"ERK")) - #"k_87" * (#"ERK_s" / (#"K_87" + #"ERK_s"))
+  $
+]
+
 == Modeling & Simulation pipeline
 
 Model definition was done in symbolic form using SymPy in python (TODO: reference them), as a list of symbolic differential equations.
