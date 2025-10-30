@@ -177,26 +177,30 @@ This method relies on a provided initial conditions and a `X-step` resolution to
 an ODE system by evaluating the equations sequentially at a consecutive `X-steps` away from the provided starting point.
 This method, while providing a weaker form of solution, can deal with harder problems,
 including those that describe complex, nonlinear systems.
+\
+A load-bearing assumptions when picking up an ODEs for modeling dynamics of intracellucal concentrantions is that within the cell,
+the system is perfectly mixed (no spatial gradients of concentration occur). This assumption lets us avoid the complexities 
+stemming from tracking chemical gradients within the cell based on position within it, which would be 
+impossible to model using just an ODE system, as multiple additional independent variables arise from having to incorporate
+positional information.
 
 Basic formulation of our model as a set of differential equations comes down to expressing
 each family of kinases as a state variable and expressing interactions between these
 kinases as a positive or negative terms in their respective differential equations. \
-Variables k and f are parameters of our model: those beginning with k concern the 
-cascade, while those beginning with f correspond to the feedback mechanism.
+Variables k and f are parameters of our model: those beginning with k generally concern the 
+cascade, while those beginning with f correspond to the feedback mechanism, with a notable 
+outlier of $"knfb"$, which is connected to both.
 
-
-
-
-
-#block[
+#figure(
   $
     (d#"RAS*")/(d t)  &= #"light" * (#"RAS" / (K_12 + #"RAS")) - k_21 * (#"RAS*" / (K_21 + #"RAS*")) \
     (d#"RAF*")/(d t) &= k_34 * #"RAS*" * (#"RAF" / (K_34 + #"RAF")) - (#"knfb" * #"NFB*" + k_43) * (#"RAF*" / (K_43 + #"RAF*")) \
     (d#"MEK*")/(d t) &= k_56 * #"RAF*" * (#"MEK" / (K_56 + #"MEK")) - k_65 * (#"MEK*" / (K_65 + #"MEK*")) \
     (d#"NFB*")/(d t) &= f_12 * #"ERK*" * (#"NFB" / (F_12 + #"NFB")) - f_21 * (#"NFB*" / (F_21 + #"NFB*")) \
     (d#"ERK*")/(d t) &= k_78 * #"MEK*" * (#"ERK" / (K_78 + #"ERK")) - k_87 * (#"ERK*" / (K_87 + #"ERK*"))
-  $
-]
+  $,
+  caption: [System of ODEs governing the simplified MAPK/ERK cascade.]
+)
 
 == Modeling & Simulation pipeline
 
@@ -211,8 +215,12 @@ An interactive environment for simulating behavior and exploring perturbations t
 was constructed using marimo notebooks. \
 Parameter estimation was done using tools from SciPy library, 
 namely `minimize` and `solve_ivp` to optimize loss function and to solve a numerical system respectively. 
-The general scheme involved minimizing residual sum of squares for the data given in an experiment across all the groups in a given experiment.
+The general scheme involved minimizing residual sum of squares for the data given 
+in an experiment across all the groups in a given experiment.
 
+Codebase is structured mainly around a `Model` class,That implements model definition,
+parameter estimation and simulating a trajectory given a stimulation pattern, parameters, and the initial condition.
+Each experiment has its own light-stimulation function and normalization and filtration of data.
 
 = Results 
 
