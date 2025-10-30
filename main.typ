@@ -167,7 +167,7 @@ state of ERK concentration in the cell.
 Ordinary differential equations is a mathemathical framework for describing the change of one variable
 (dependant variable, here Y) over another variable (independent variable, here X). 
 Its simplest formulation is an expression that equates some mathematical expression to a
-derivative of our variable in question over the independent variable. $ frac(d Y,d X) = ... $ 
+derivative of our variable in question Y over the independent variable X. $ frac(d Y,d X) = ... $ 
 A solution to a differential equation is usually understood as obtaining a $Y(X)$ form, also called an _general solution_.
 General solutions can be obtained using an analytical solving process, the difficulty of which is heavily 
 dependant on the specifc problem being solved. An often encountered problem with analytical solution approach 
@@ -178,14 +178,21 @@ an ODE system by evaluating the equations sequentially at a consecutive `X-steps
 This method, while providing a weaker form of solution, can deal with harder problems,
 including those that describe complex, nonlinear systems.
 
+Basic formulation of our model as a set of differential equations comes down to expressing
+each family of kinases as a state variable and expressing interactions between these
+kinases as a positive or negative terms in their respective differential equations.
+
+
+
+
 
 #block[
   $
-    d(#"RAS*")/d(t) &= #"light" * (#"RAS" / (#"K_12" + #"RAS")) - #"k_21" * (#"RAS*" / (#"K_21" + #"RAS*")) \
-    d(#"RAF*")/d(t) &= #"k_34" * #"RAS*" * (#"RAF" / (#"K_34" + #"RAF")) - (#"knfb" * #"NFB*" + #"k_43") * (#"RAF*" / (#"K_43" + #"RAF*")) \
-    d(#"MEK*")/d(t) &= #"k_56" * #"RAF*" * (#"MEK" / (#"K_56" + #"MEK")) - #"k_65" * (#"MEK*" / (#"K_65" + #"MEK*")) \
-    d(#"NFB*")/d(t) &= #"f_12" * #"ERK*" * (#"NFB" / (#"F_12" + #"NFB")) - #"f_21" * (#"NFB*" / (#"F_21" + #"NFB*")) \
-    d(#"ERK*")/d(t) &= #"k_78" * #"MEK*" * (#"ERK" / (#"K_78" + #"ERK")) - #"k_87" * (#"ERK*" / (#"K_87" + #"ERK*"))
+    (d#"RAS*")/(d t)  &= #"light" * (#"RAS" / (#"K_12" + #"RAS")) - #"k_21" * (#"RAS*" / (#"K_21" + #"RAS*")) \
+    (d#"RAF*")/(d t) &= #"k_34" * #"RAS*" * (#"RAF" / (#"K_34" + #"RAF")) - (#"knfb" * #"NFB*" + #"k_43") * (#"RAF*" / (#"K_43" + #"RAF*")) \
+    (d#"MEK*")/(d t) &= #"k_56" * #"RAF*" * (#"MEK" / (#"K_56" + #"MEK")) - #"k_65" * (#"MEK*" / (#"K_65" + #"MEK*")) \
+    (d#"NFB*")/(d t) &= #"f_12" * #"ERK*" * (#"NFB" / (#"F_12" + #"NFB")) - #"f_21" * (#"NFB*" / (#"F_21" + #"NFB*")) \
+    (d#"ERK*")/(d t) &= #"k_78" * #"MEK*" * (#"ERK" / (#"K_78" + #"ERK")) - #"k_87" * (#"ERK*" / (#"K_87" + #"ERK*"))
   $
 ]
 
