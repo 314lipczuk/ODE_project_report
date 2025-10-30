@@ -180,7 +180,9 @@ including those that describe complex, nonlinear systems.
 
 Basic formulation of our model as a set of differential equations comes down to expressing
 each family of kinases as a state variable and expressing interactions between these
-kinases as a positive or negative terms in their respective differential equations.
+kinases as a positive or negative terms in their respective differential equations. \
+Variables k and f are parameters of our model: those beginning with k concern the 
+cascade, while those beginning with f correspond to the feedback mechanism.
 
 
 
@@ -188,11 +190,11 @@ kinases as a positive or negative terms in their respective differential equatio
 
 #block[
   $
-    (d#"RAS*")/(d t)  &= #"light" * (#"RAS" / (#"K_12" + #"RAS")) - #"k_21" * (#"RAS*" / (#"K_21" + #"RAS*")) \
-    (d#"RAF*")/(d t) &= #"k_34" * #"RAS*" * (#"RAF" / (#"K_34" + #"RAF")) - (#"knfb" * #"NFB*" + #"k_43") * (#"RAF*" / (#"K_43" + #"RAF*")) \
-    (d#"MEK*")/(d t) &= #"k_56" * #"RAF*" * (#"MEK" / (#"K_56" + #"MEK")) - #"k_65" * (#"MEK*" / (#"K_65" + #"MEK*")) \
-    (d#"NFB*")/(d t) &= #"f_12" * #"ERK*" * (#"NFB" / (#"F_12" + #"NFB")) - #"f_21" * (#"NFB*" / (#"F_21" + #"NFB*")) \
-    (d#"ERK*")/(d t) &= #"k_78" * #"MEK*" * (#"ERK" / (#"K_78" + #"ERK")) - #"k_87" * (#"ERK*" / (#"K_87" + #"ERK*"))
+    (d#"RAS*")/(d t)  &= #"light" * (#"RAS" / (K_12 + #"RAS")) - k_21 * (#"RAS*" / (K_21 + #"RAS*")) \
+    (d#"RAF*")/(d t) &= k_34 * #"RAS*" * (#"RAF" / (K_34 + #"RAF")) - (#"knfb" * #"NFB*" + k_43) * (#"RAF*" / (K_43 + #"RAF*")) \
+    (d#"MEK*")/(d t) &= k_56 * #"RAF*" * (#"MEK" / (K_56 + #"MEK")) - k_65 * (#"MEK*" / (K_65 + #"MEK*")) \
+    (d#"NFB*")/(d t) &= f_12 * #"ERK*" * (#"NFB" / (F_12 + #"NFB")) - f_21 * (#"NFB*" / (F_21 + #"NFB*")) \
+    (d#"ERK*")/(d t) &= k_78 * #"MEK*" * (#"ERK" / (K_78 + #"ERK")) - k_87 * (#"ERK*" / (K_87 + #"ERK*"))
   $
 ]
 
