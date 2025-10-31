@@ -202,6 +202,13 @@ outlier of $"knfb"$, which is connected to both.
   caption: [System of ODEs governing the simplified MAPK/ERK cascade.]
 )
 
+The final assumption held was that on the timescale of observed experiments, the 
+total amount of active and inactive form of a given molecule is constant (a "conserved moities" assumption).
+Such assumption allows for description of entire model using only half of the state variables, by introducing each sum of forms 
+as a constant in our model, thereby allowing us to refer the concentrations of active and inactive parts using a single concentration and a total 
+(for example, instead of using $"RAS*"$ and $"RAS"$, we can use $"RAS*"$ and $"RAS"_"total" - "RAS*"$).
+This operation makes the simulation less computationally complex.
+
 == Modeling & Simulation pipeline
 
 Model definition was done in symbolic form using SymPy in python (TODO: reference them), as a list of symbolic differential equations.
@@ -223,6 +230,21 @@ parameter estimation and simulating a trajectory given a stimulation pattern, pa
 Each experiment has its own light-stimulation function and normalization and filtration of data.
 
 = Results 
+
+#figure(caption: [Results of 3 single-experiment fits. ])[
+#grid(
+  columns: 2,
+  rows: 2,
+  gutter: 1em,
+    image("static/single_fit_sustained_1.png", width: 100%),
+    image("static/single_fit_ramp_1.png", width: 100%),
+    grid.cell(colspan:2)[
+      #align(center)[
+        #image("static/single_fit_transient_1.png", width: 50%)
+      ]
+    ],
+  )
+]
 
 = Discussion
 
