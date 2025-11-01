@@ -8,12 +8,9 @@
   author: "Przemysław Pilipczuk",
   date: datetime(year: 2025, month: 10, day: 13),
   abstract: [
-    Abstract text
-  ],
-  preface: [
-    #align(center + horizon)[
-      Preface text
-    ]
+    A mechanistic model of MAPK/ERK signalling pathway was constructed using Ordniary Differential Equations and 
+    implemented into a pipeline for simulating and fitting parameters against experimental data. 
+    Three experiments were compared, and despite solid single-experiment fits, the cross-validation TODO:...
   ],
   bibliography: bibliography("refs.bib"),
   figure-index: (enabled: true),
@@ -21,9 +18,10 @@
   listing-index: (enabled: true),
 )
 
-= Abstract
+= Introduction
+
 The MAPK/ERK pathway serves a key role in determining fate of a cell from extracellular inputs. 
-Different cell fates are linked to a dynamics of the final node in the cascade, `ERK` kinases. 
+Different cell fates are linked to a dynamics of the final node in the cascade, `ERK` kinases.
 To understand how different dynamc patterns of their behavior arise, 
 we attempt to mechanistically model the simplified version of this pathway using Ordinary Differential Equations.
 Using data from a fibroblast cell transfected with optoRTK constructs and stimulated with various patterns of light, 
@@ -31,8 +29,7 @@ we attempted to estimated model parameters based on these experiments and use cr
 check for generalization. Resulting fits had problems with achieving several performance metrics that would singify 
 an optimal solution. 
 
-= Introduction
-TODO
+
 
 = Methods & Materials
 
@@ -115,7 +112,7 @@ parameter unidentifiability, and poor choice of starting condition leading to no
     // === MAIN DOWNWARD CASCADE ===
     //edge(<light>,  <ras_s>, "-|>", [light]),
     edge(<ras_s>,  <rxn_raf2>, "-|>", [], bend:-25deg),
-    edge(<raf_s>,  <rxn_mek>, "-|>", [], bend:25deg),
+    edge(<raf_s>,  <rxn_mek>, "-|>", [], bend: 25deg),
     edge(<mek_s>,  <rxn_erk>, "-|>", [], bend:-25deg),
     //edge(<erk_s>,  <nfb_s>, "-|>", [], bend: -25deg),
 
@@ -193,7 +190,7 @@ outlier of $"knfb"$, which is connected to both.
 
 #figure(
   $
-    (d#"RAS*")/(d t)  &= #"light" * (#"RAS" / (K_12 + #"RAS")) - k_21 * (#"RAS*" / (K_21 + #"RAS*")) \
+    (d#"RAS*")/(d t) &= #"light" * (#"RAS" / (K_12 + #"RAS")) - k_21 * (#"RAS*" / (K_21 + #"RAS*")) \
     (d#"RAF*")/(d t) &= k_34 * #"RAS*" * (#"RAF" / (K_34 + #"RAF")) - (#"knfb" * #"NFB*" + k_43) * (#"RAF*" / (K_43 + #"RAF*")) \
     (d#"MEK*")/(d t) &= k_56 * #"RAF*" * (#"MEK" / (K_56 + #"MEK")) - k_65 * (#"MEK*" / (K_65 + #"MEK*")) \
     (d#"NFB*")/(d t) &= f_12 * #"ERK*" * (#"NFB" / (F_12 + #"NFB")) - f_21 * (#"NFB*" / (F_21 + #"NFB*")) \
@@ -231,7 +228,12 @@ Each experiment has its own light-stimulation function and normalization and fil
 
 = Results 
 
-#figure(caption: [Results of 3 single-experiment fits. ])[
+== Parameter estimation from a single experiment
+The preliminary fits over single experiments captures each individual dynamic response quite well in the broad strokes. 
+However, a noticable pattern across these peaks is that the model rarely captures quantitative metrix such a $c_"max"$, 
+cannot account for changes in baseline, and has trouble accurately fitting scenarios with wide range of experimental groups.
+
+#figure(caption: [Results of 3 single-experiment fits.])[
 #grid(
   columns: 2,
   rows: 2,
@@ -245,6 +247,9 @@ Each experiment has its own light-stimulation function and normalization and fil
     ],
   )
 ]
+
+== Cross-validation
+
 
 = Discussion
 
@@ -263,9 +268,5 @@ To circumvent this problem, two solutions were contemplated.
 2. A proxy metric for a total light energy of a light pulse for a datapoint is introduced instead of a "binary" baseline. This allows for more flexibility but at a cost of having to create a realistically-scaling function that works for all kinds of experiments and across different levels of magnitude of light stimulation duration.
 
 After theoretical evaluation of pros and const of both, a second solution strategy was picked, due to a better compatibility with the goal of having short training times. 
- 
-= Conclusions
 
 = Future work
-
-= Supplementary material
