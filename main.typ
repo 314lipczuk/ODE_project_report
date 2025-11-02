@@ -10,7 +10,8 @@
   abstract: [
     A mechanistic model of MAPK/ERK signalling pathway was constructed using Ordniary Differential Equations and 
     implemented into a pipeline for simulating and fitting parameters against experimental data. 
-    Three experiments were compared, and despite solid single-experiment fits, the cross-validation TODO:...
+    Three experiments were compared, and despite solid single-experiment fits, the cross-validation shows significant 
+    problems with generalization of fitted parameters across experiments.
   ],
   bibliography: bibliography("refs.bib"),
   figure-index: (enabled: true),
@@ -20,16 +21,18 @@
 
 = Introduction
 
-The MAPK/ERK pathway serves a key role in determining fate of a cell from extracellular inputs. 
-Different cell fates are linked to a dynamics of the final node in the cascade, `ERK` kinases.
+The mitogen-activated protein kinase/extracellular signal-regulated kinase (MAPK/ERK) pathway and its dynamics 
+play a central role in determining cell fate in response to extracellular inputs. 
+Different cell fates are linked to dynamics of the final node in the cascade, `ERK` kinases in particular.
 To understand how different dynamc patterns of their behavior arise, 
-we attempt to mechanistically model the simplified version of this pathway using Ordinary Differential Equations.
-Using data from a fibroblast cell transfected with optoRTK constructs and stimulated with various patterns of light, 
-we attempted to estimated model parameters based on these experiments and use cross-validation techniques to 
-check for generalization. Resulting fits had problems with achieving several performance metrics that would singify 
-an optimal solution. 
-
-
+a mechanistical model of this pathway was constructed using ordinary differential equations (ODEs).
+Experimental data was obtained from a series of experiments including fibroblast cells transfected with optogenetic recetor 
+tyrosine kinases (optoRTKs) constructs and an ERK-KTR reporter, that over the course of experiment were stimulated with 
+different light patterns.
+Model parameters were estimated from this data, and cross-validation techniques were employed to evaluate generalizability of fitted
+parameters.
+Although individual experiments were fitted accurately,
+the resulting model failed to generalize across conditions, indicating need for further refinement.
 
 = Methods & Materials
 
@@ -73,7 +76,7 @@ starting from 0 and ending at 700ms pulse width, resulting in overall ramp shape
 The development and initial testing of modeling pipeline was done using only transient activation experiment. 
 Sustained and Ramp were incorporated as a means of providing cross-validation for the fitting process.
 
-== The chosen model
+== Model Structure
 
 Finding the balance between simplicity and mechanistic accuracy is the key problem in model definition. 
 Too simple model results in non-relevant findings, since it fails to capture complexity of the problem.
@@ -250,6 +253,20 @@ cannot account for changes in baseline, and has trouble accurately fitting scena
 
 == Cross-validation
 
+#figure(caption: [Results of 3-fold cross validation. There is observable lack of generalization across between experiments. Model trained on transient and ramp experiments and tested on sustained shows the best results in that it reproduces the shape of the activation we see in the data. However, the quantitative values outputted by the model are consistently overshooting the experimental observations. Other folds of cross-validation fail to reproduce the ERK activation dynamics at all. ])[
+#grid(
+  columns: 2,
+  rows: 2,
+  gutter: 1em,
+    image("static/cv_fit_sustained_1.png", width: 100%),
+    image("static/cv_fit_ramp_1.png", width: 100%),
+    grid.cell(colspan:2)[
+      #align(center)[
+        #image("static/cv_fit_transient_1.png", width: 50%)
+      ]
+    ],
+  )
+]
 
 = Discussion
 
