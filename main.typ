@@ -40,8 +40,13 @@ the resulting model failed to generalize across conditions, indicating need for 
 Data used for fitting the model was obtained from an experimental setup consisting of fibroblast cells 
 transfected with an optoEGFR construct (optogenetic actuator) and being stimulated with various patterns of light.
 Data from 3 experiments were used in our pipeline, representing distinct light activation patterns. 
-All experiments start with a 10 minute period of no actication, that we use for calibrating the baseline levels of activity.\
-First pattern that was investigated was a transient actuvation pulse for a given amount of time. 
+All experiments start with a 10 minute period of no stimulation, 
+that was used for calibrating the baseline levels of activity. Sampling rate of each experiment was $1 / "min"$.
+Data was prepared by first converting raw intensities captured by the microscope 
+for nucleus and cytoplasm into a fraction $I_"cytoplasm"/(I_"cytoplasm"+I_"nucleus")$ representing active ERK.
+Baseline subtraction was done on a per-cell level, and afterward normalization was performed 
+for each experimental group separately. 
+First pattern that was investigated was a transient activation pulse for a given amount of time. 
 The experiment was repeated with different durations, namely
 $t = {0, 50, 100, 200, 500, 1000}$ ms. This experiment was used during development for
 testing and verifying due to its simplicity.
@@ -64,12 +69,12 @@ stimulation was started and sustained for a 140 minutes with three different pow
 )
 
 Third pattern incorporated into the pipeline was a ramp pattern. This pattern starts by
-running a light pulse every minute, and increasing the pulse widht with every subsequent actication,
+running a light pulse every minute, and increasing the pulse width with every subsequent actication,
 starting from 0 and ending at 700ms pulse width, resulting in overall ramp shape of the activation curve over time.
 
 #figure(
   image("static/singlecell_ramp.png"),
-  caption: [Single cell ERK-KTR activity in sustained activation experiment. \
+  caption: [Single cell ERK-KTR activity in ramp activation experiment. \
   Each black curve is a single cell trajectory of ERK-KTR, red line describes median.]
 )
 
@@ -150,31 +155,31 @@ parameter unidentifiability, and poor choice of starting condition leading to no
 caption: [Diagram of the used model, representing simplified MAPK/ERK cascade. ]
 )
 
-Our chosen model starts at the level of RAS, and does not include the receptor layer. It treats light as a positive term in converting
-RAS to RAS\*. The standard MAPK/ERK cascade of RAS-RAF-MEK-ERK is preserved 
+The chosen model starts at the level of RAS, and does not include the receptor layer. It treats light as a positive term in converting
+RAS to RAS\* (the active form). The standard MAPK/ERK cascade of RAS-RAF-MEK-ERK is preserved.
 We group whole families of kinases together and represent them as one vertex to preserve ontological
-grouping while minimising complexity of the model.
-Model also contains a negative feelback loop represented as a seperate NFB vertex in above graph. 
+grouping while minimizing complexity of the model.
+Model also contains a negative feedback loop represented as a separate te NFB vertex in above graph. 
 Modeling negative feedback as a separate state variable is not mechanistically accurate, but allows for a number of useful properties.
 It helps with model understandability, as negative feedback has clear and separate parameters that can be tweaked in isolation, while 
-its existance as a state variable in the simulated model helps to track the contribution of negative feedback on the rest of the system.
-Another remarkable simplification of experimental setup comes from removal of reporter later (KTR-ERK complex). 
+its existence as a state variable in the simulated model helps to track the contribution of negative feedback on the rest of the system.
+Another remarkable simplification of experimental setup comes from removal of reporter layer (KTR-ERK complex). 
 Presented model assumes that gathered experimental data coming from the reporter is a perfect proxy of actual 
 state of ERK concentration in the cell.
 
 == Ordinary Differential Equations
 
-Ordinary differential equations is a mathemathical framework for describing the change of one variable
-(dependant variable, here Y) over another variable (independent variable, here X). 
+Ordinary differential equations are a mathematical framework for describing the change of one variable
+(dependent variable, here Y) over another variable (independent variable, here X). 
 Its simplest formulation is an expression that equates some mathematical expression to a
 derivative of our variable in question Y over the independent variable X. $ frac(d Y,d X) = ... $ 
 A solution to a differential equation is usually understood as obtaining a $Y(X)$ form, also called an _general solution_.
 General solutions can be obtained using an analytical solving process, the difficulty of which is heavily 
-dependant on the specifc problem being solved. An often encountered problem with analytical solution approach 
+dependent on the specific problem being solved. An often encountered problem with analytical solution approach 
 is a problem that contains complex, nonlinearly coupled equations, which do not yield easily to this method. 
 An alternative approach to solving a system that has these characteristics is a numerical one.
-This method relies on a provided initial conditions and a `X-step` resolution to simulate a single trajectory within
-an ODE system by evaluating the equations sequentially at a consecutive `X-steps` away from the provided starting point.
+This method relies on provided initial conditions and $Delta x$ resolution to simulate a single trajectory within
+an ODE system by evaluating the equations sequentially at a consecutive `Delta x` away from the provided starting point.
 This method, while providing a weaker form of solution, can deal with harder problems,
 including those that describe complex, nonlinear systems.
 \
@@ -208,7 +213,8 @@ Such assumption allows for description of entire model using only half of the st
 as a constant in our model, thereby allowing us to refer the concentrations of active and inactive parts using a single concentration and a total 
 (for example, instead of using $"RAS*"$ and $"RAS"$, we can use $"RAS*"$ and $"RAS"_"total" - "RAS*"$).
 This operation makes the simulation less computationally complex.
-
+Since the data was already normalized to account for varying cell size (removing baseline and scaling by max magnitude per group) for active ERK fraction, 
+total kinase concentration was set to a constant of 1.
 == Modeling & Simulation pipeline
 
 Model definition was done in symbolic form using SymPy in python (TODO: reference them), as a list of symbolic differential equations.
@@ -225,9 +231,9 @@ namely `minimize` and `solve_ivp` to optimize loss function and to solve a numer
 The general scheme involved minimizing residual sum of squares for the data given 
 in an experiment across all the groups in a given experiment.
 
-Codebase is structured mainly around a `Model` class,That implements model definition,
+Codebase is structured mainly around a `Model` class that implements model definition,
 parameter estimation and simulating a trajectory given a stimulation pattern, parameters, and the initial condition.
-Each experiment has its own light-stimulation function and normalization and filtration of data.
+Each experiment has its own light-stimulation function and normalization and filtering of data.
 
 = Results 
 
