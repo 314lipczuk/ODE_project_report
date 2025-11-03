@@ -8,7 +8,7 @@
   author: "Przemysław Pilipczuk",
   date: datetime(year: 2025, month: 10, day: 13),
   abstract: [
-    A mechanistic model of MAPK/ERK signalling pathway was constructed using Ordniary Differential Equations and 
+    A mechanistic model of MAPK/ERK signaling pathway was constructed using Ordinary Differential Equations and 
     implemented into a pipeline for simulating and fitting parameters against experimental data. 
     Three experiments were compared, and despite solid single-experiment fits, the cross-validation shows significant 
     problems with generalization of fitted parameters across experiments.
@@ -20,19 +20,18 @@
 )
 
 = Introduction
-
 The mitogen-activated protein kinase/extracellular signal-regulated kinase (MAPK/ERK) pathway and its dynamics 
-play a central role in determining cell fate in response to extracellular inputs. 
+play a central role in determining cell fate in response to extracellular inputs. @Ryu_Chung_Dobrzyński_Fey_Blum_Lee_Peter_Kholodenko_Jeon_Pertz_2015
 Different cell fates are linked to dynamics of the final node in the cascade, `ERK` kinases in particular.
-To understand how different dynamc patterns of their behavior arise, 
-a mechanistical model of this pathway was constructed using ordinary differential equations (ODEs).
-Experimental data was obtained from a series of experiments including fibroblast cells transfected with optogenetic recetor 
-tyrosine kinases (optoRTKs) constructs and an ERK-KTR reporter, that over the course of experiment were stimulated with 
-different light patterns.
-Model parameters were estimated from this data, and cross-validation techniques were employed to evaluate generalizability of fitted
+To understand how different dynamic patterns of their behavior arise, 
+a mechanistic model of this pathway was constructed using ordinary differential equations (ODEs).
+Experimental data was obtained from a series of experiments including fibroblast cells transfected with optogenetic receptor 
+tyrosine kinases (optoRTKs) constructs and an ERK-KTR reporter. The cells were stimulated with 
+different light patterns over the course of the experiment.
+Model parameters were estimated from this data, and cross-validation techniques were employed to evaluate the generalizability of fitted
 parameters.
 Although individual experiments were fitted accurately,
-the resulting model failed to generalize across conditions, indicating need for further refinement.
+the resulting model failed to generalize across conditions, indicating the need for further refinement.
 
 = Methods & Materials
 
@@ -159,7 +158,7 @@ The chosen model starts at the level of RAS, and does not include the receptor l
 RAS to RAS\* (the active form). The standard MAPK/ERK cascade of RAS-RAF-MEK-ERK is preserved.
 We group whole families of kinases together and represent them as one vertex to preserve ontological
 grouping while minimizing complexity of the model.
-Model also contains a negative feedback loop represented as a separate te NFB vertex in above graph. 
+Model also contains a negative feedback loop represented as a separate NFB state variable (Figure 4). 
 Modeling negative feedback as a separate state variable is not mechanistically accurate, but allows for a number of useful properties.
 It helps with model understandability, as negative feedback has clear and separate parameters that can be tweaked in isolation, while 
 its existence as a state variable in the simulated model helps to track the contribution of negative feedback on the rest of the system.
@@ -170,20 +169,20 @@ state of ERK concentration in the cell.
 == Ordinary Differential Equations
 
 Ordinary differential equations are a mathematical framework for describing the change of one variable
-(dependent variable, here Y) over another variable (independent variable, here X). 
+(dependent) over another variable (independent). 
 Its simplest formulation is an expression that equates some mathematical expression to a
-derivative of our variable in question Y over the independent variable X. $ frac(d Y,d X) = ... $ 
-A solution to a differential equation is usually understood as obtaining a $Y(X)$ form, also called an _general solution_.
+derivative of our variable in question Y over the independent variable X. $ frac(d Y(x),d X) = f(y(x)) $ 
+A solution to a differential equation is usually understood as obtaining a $Y(X)$ form, also called an _general solution_ @fey_modeling_ode.
 General solutions can be obtained using an analytical solving process, the difficulty of which is heavily 
 dependent on the specific problem being solved. An often encountered problem with analytical solution approach 
 is a problem that contains complex, nonlinearly coupled equations, which do not yield easily to this method. 
 An alternative approach to solving a system that has these characteristics is a numerical one.
 This method relies on provided initial conditions and $Delta x$ resolution to simulate a single trajectory within
-an ODE system by evaluating the equations sequentially at a consecutive `Delta x` away from the provided starting point.
+an ODE system by evaluating the equations sequentially at a consecutive $Delta x$ away from the provided starting point.
 This method, while providing a weaker form of solution, can deal with harder problems,
 including those that describe complex, nonlinear systems.
 \
-A load-bearing assumptions when picking up an ODEs for modeling dynamics of intracellucal concentrantions is that within the cell,
+A load-bearing assumptions when picking up an ODEs for modeling dynamics of intracellucal concentrations is that within the cell,
 the system is perfectly mixed (no spatial gradients of concentration occur). This assumption lets us avoid the complexities 
 stemming from tracking chemical gradients within the cell based on position within it, which would be 
 impossible to model using just an ODE system, as multiple additional independent variables arise from having to incorporate
@@ -212,12 +211,12 @@ total amount of active and inactive form of a given molecule is constant (a "con
 Such assumption allows for description of entire model using only half of the state variables, by introducing each sum of forms 
 as a constant in our model, thereby allowing us to refer the concentrations of active and inactive parts using a single concentration and a total 
 (for example, instead of using $"RAS*"$ and $"RAS"$, we can use $"RAS*"$ and $"RAS"_"total" - "RAS*"$).
-This operation makes the simulation less computationally complex.
+This operation makes the simulation less computationally complex @fey_modeling_ode.
 Since the data was already normalized to account for varying cell size (removing baseline and scaling by max magnitude per group) for active ERK fraction, 
 total kinase concentration was set to a constant of 1.
 == Modeling & Simulation pipeline
 
-Model definition was done in symbolic form using SymPy in python (TODO: reference them), as a list of symbolic differential equations.
+Model definition was done in symbolic form using SymPy in python @sympy, as a list of symbolic differential equations.
 The same tool was also used to lower the symbolic expression down to a numerical representation (`lambdify` function).
 A constructed model consists of a set of differential equations and parameter values.
 An effort was made to make this pipeline model-and-experiment agnostic and have low friction for implementing new models.
@@ -226,14 +225,14 @@ its equations and parameters, and each new experiment needs to define its own pa
 parsing function for the data it generated. \
 An interactive environment for simulating behavior and exploring perturbations to parameters 
 was constructed using marimo notebooks. \
-Parameter estimation was done using tools from SciPy library, 
+Parameter estimation was done using tools from SciPy library @scipy, 
 namely `minimize` and `solve_ivp` to optimize loss function and to solve a numerical system respectively. 
 The general scheme involved minimizing residual sum of squares for the data given 
 in an experiment across all the groups in a given experiment.
 
 Codebase is structured mainly around a `Model` class that implements model definition,
 parameter estimation and simulating a trajectory given a stimulation pattern, parameters, and the initial condition.
-Each experiment has its own light-stimulation function and normalization and filtering of data.
+Each experiment has its own light-stimulation function and a function to read, filter, and normalize data.
 
 = Results 
 
@@ -274,9 +273,19 @@ cannot account for changes in baseline, and has trouble accurately fitting scena
   )
 ]
 
+Cross-validation was performed to evaluate the generalizability of parameter sets fitted on one experiment when applied to others (Figure 7).
+Significant variation in predictive accuracy was observed across validation folds.
+The model trained on the transient and ramp activation datasets and tested on the sustained experiment exhibited the highest degree of qualitative agreement, correctly reproducing the overall shape of the activation curve.
+However, the model consistently overestimated activation magnitudes and failed to accurately capture the saturation plateau observed in the experimental data.
+
+In contrast, parameter sets trained on the sustained or ramp experiments failed to reproduce ERK activation patterns in the transient experiment, producing responses that were temporally misaligned and quantitatively inconsistent.
+This poor cross-experimental transfer indicates that fitted parameters are highly context-dependent and may be influenced by experimental conditions such as stimulation pattern, sampling frequency, and cellular heterogeneity.
+
+The results therefore demonstrate that the current model lacks global parameter robustness and cannot yet serve as a unified predictor of ERK activation dynamics across distinct stimulation regimes.
+
 = Discussion
 
-== Time resolution trouble
+== Time resolution limitations
 During implementation of the parameter estimation regime, a technical difficulty was encountered. 
 The experiments had been replicated multiple times with different parameter values for light stimulation,
 usually differing in stimulation time of a pulse of light, with values ranging from 50ms to 2000ms.
