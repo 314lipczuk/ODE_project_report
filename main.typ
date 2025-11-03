@@ -251,7 +251,7 @@ The preliminary fits over single experiments captures each individual dynamic re
 However, a noticable pattern across these peaks is that the model rarely captures quantitative metrics such a $c_"max"$, 
 cannot account for changes in baseline, and has trouble accurately fitting scenarios with wide range of stimulation conditions.
 
-#figure(caption: [Results of 3 single-experiment fits.])[
+#figure(caption: [Results of 3 single-experiment fits. X axis shows time (min), and Y axis shows normalized cytoplasmic ERK-KTR intensity, representing active ERK fraction. Label next to Y axis denotes experimental group. ])[
 #grid(
   columns: 2,
   rows: 2,
@@ -268,7 +268,7 @@ cannot account for changes in baseline, and has trouble accurately fitting scena
 
 == Cross-validation
 
-#figure(caption: [Results of 3-fold cross validation. There is observable lack of generalization between experiments. Model trained on transient and ramp experiments and tested on sustained shows the best results in that it reproduces the shape of the activation we see in the data. However, the quantitative values outputted by the model are consistently overshooting the experimental observations. Other folds of cross-validation fail to reproduce the ERK activation dynamics at all. ])[
+#figure(caption: [Results of 3-fold cross validation. X axis shows time (min), and Y axis shows normalized cytoplasmic ERK-KTR intensity, representing active ERK fraction. Label next to Y axis denotes experimental group. There is observable lack of generalization between experiments. Model trained on transient and ramp experiments and tested on sustained shows the best results in that it reproduces the shape of the activation we see in the data. However, the quantitative values outputted by the model are consistently overshooting the experimental observations. Other folds of cross-validation fail to reproduce the ERK activation dynamics at all. ])[
 #grid(
   columns: 2,
   rows: 2,
