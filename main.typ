@@ -27,7 +27,7 @@ To understand how different dynamic patterns of their behavior arise,
 a mechanistic model of this pathway was constructed using ordinary differential equations (ODEs).
 Experimental data was obtained from a series of experiments including fibroblast cells transfected with optogenetic receptor 
 tyrosine kinases (optoRTKs) constructs and an ERK-KTR reporter. The cells were stimulated with 
-different light patterns over the course of the experiment.
+different light patterns over the course of each experiment.
 Model parameters were estimated from this data, and cross-validation techniques were employed to evaluate the generalizability of fitted
 parameters.
 Although individual experiments were fitted accurately,
@@ -41,7 +41,7 @@ transfected with an optoEGFR construct (optogenetic actuator) and being stimulat
 Data from 3 experiments were used in our pipeline, representing distinct light activation patterns. 
 All experiments start with a 10 minute period of no stimulation, 
 that was used for calibrating the baseline levels of activity. Sampling rate of each experiment was $1 / "min"$.
-Data was prepared by first converting raw intensities captured by the microscope 
+Data was prepared by first converting raw intensities captured
 for nucleus and cytoplasm into a fraction $I_"cytoplasm"/(I_"cytoplasm"+I_"nucleus")$ representing active ERK.
 Baseline subtraction was done on a per-cell level, and afterward normalization was performed 
 for each experimental group separately. 
@@ -68,7 +68,7 @@ stimulation was started and sustained for a 140 minutes with three different pow
 )
 
 Third pattern incorporated into the pipeline was a ramp pattern. This pattern starts by
-running a light pulse every minute, and increasing the pulse width with every subsequent actication,
+running a light pulse every minute, and increasing the pulse width with every subsequent activation,
 starting from 0 and ending at 700ms pulse width, resulting in overall ramp shape of the activation curve over time.
 
 #figure(
@@ -85,7 +85,21 @@ Sustained and Ramp were incorporated as a means of providing cross-validation fo
 Finding the balance between simplicity and mechanistic accuracy is the key problem in model definition. 
 Too simple model results in non-relevant findings, since it fails to capture complexity of the problem.
 Too complex model is harder to operate, and is prone to fragile to comlexity explosions,
-parameter unidentifiability, and poor choice of starting condition leading to nonsensical results.
+parameter unidentifiability, and poor choice of starting condition leading to nonsensical results.\
+
+The chosen model starts at the level of RAS, and does not include the receptor layer. It treats light as a positive term in converting
+RAS to RAS\* (the active form). The standard MAPK/ERK cascade of RAS-RAF-MEK-ERK is preserved.
+We group whole families of kinases together and represent them as one vertex to preserve ontological
+grouping while minimizing complexity of the model.
+
+Model also contains a negative feedback loop represented as a separate NFB state variable (Figure 4). 
+Modeling negative feedback as a separate state variable is not mechanistically accurate, but allows for a number of useful properties.
+It helps with model understandability, as negative feedback has clear and separate parameters that can be tweaked in isolation, while 
+its existence as a state variable in the simulated model helps to track the contribution of negative feedback on the rest of the system.
+Another remarkable simplification of experimental setup comes from removal of reporter layer (KTR-ERK complex). 
+Presented model assumes that gathered experimental data coming from the reporter is a perfect proxy of actual 
+state of ERK concentration in the cell.
+
 #figure(
   diagram(
     spacing: 4em,
@@ -154,18 +168,6 @@ parameter unidentifiability, and poor choice of starting condition leading to no
 caption: [Diagram of the used model, representing simplified MAPK/ERK cascade. ]
 )
 
-The chosen model starts at the level of RAS, and does not include the receptor layer. It treats light as a positive term in converting
-RAS to RAS\* (the active form). The standard MAPK/ERK cascade of RAS-RAF-MEK-ERK is preserved.
-We group whole families of kinases together and represent them as one vertex to preserve ontological
-grouping while minimizing complexity of the model.
-Model also contains a negative feedback loop represented as a separate NFB state variable (Figure 4). 
-Modeling negative feedback as a separate state variable is not mechanistically accurate, but allows for a number of useful properties.
-It helps with model understandability, as negative feedback has clear and separate parameters that can be tweaked in isolation, while 
-its existence as a state variable in the simulated model helps to track the contribution of negative feedback on the rest of the system.
-Another remarkable simplification of experimental setup comes from removal of reporter layer (KTR-ERK complex). 
-Presented model assumes that gathered experimental data coming from the reporter is a perfect proxy of actual 
-state of ERK concentration in the cell.
-
 == Ordinary Differential Equations
 
 Ordinary differential equations are a mathematical framework for describing the change of one variable
@@ -182,7 +184,7 @@ an ODE system by evaluating the equations sequentially at a consecutive $Delta x
 This method, while providing a weaker form of solution, can deal with harder problems,
 including those that describe complex, nonlinear systems.
 \
-A load-bearing assumptions when picking up an ODEs for modeling dynamics of intracellucal concentrations is that within the cell,
+A load-bearing assumptions when picking up an ODEs for modeling dynamics of intracellural concentrations is that within the cell,
 the system is perfectly mixed (no spatial gradients of concentration occur). This assumption lets us avoid the complexities 
 stemming from tracking chemical gradients within the cell based on position within it, which would be 
 impossible to model using just an ODE system, as multiple additional independent variables arise from having to incorporate
@@ -207,7 +209,7 @@ outlier of $"knfb"$, which is connected to both.
 )
 
 The final assumption held was that on the timescale of observed experiments, the 
-total amount of active and inactive form of a given molecule is constant (a "conserved moities" assumption).
+total amount of active and inactive form of a given molecule is constant (a "conserved moieties" assumption).
 Such assumption allows for description of entire model using only half of the state variables, by introducing each sum of forms 
 as a constant in our model, thereby allowing us to refer the concentrations of active and inactive parts using a single concentration and a total 
 (for example, instead of using $"RAS*"$ and $"RAS"$, we can use $"RAS*"$ and $"RAS"_"total" - "RAS*"$).
@@ -247,7 +249,7 @@ however during model validation, all training runs started with the same paramet
 == Parameter estimation from a single experiment
 The preliminary fits over single experiments captures each individual dynamic response quite well in the broad strokes. 
 However, a noticable pattern across these peaks is that the model rarely captures quantitative metrix such a $c_"max"$, 
-cannot account for changes in baseline, and has trouble accurately fitting scenarios with wide range of experimental groups.
+cannot account for changes in baseline, and has trouble accurately fitting scenarios with wide range of stimulation conditions.
 
 #figure(caption: [Results of 3 single-experiment fits.])[
 #grid(
@@ -289,7 +291,9 @@ However, the model consistently overestimated activation magnitudes and failed t
 In contrast, parameter sets trained on the sustained or ramp experiments failed to reproduce ERK activation patterns in the transient experiment, producing responses that were temporally misaligned and quantitatively inconsistent.
 This poor cross-experimental transfer indicates that fitted parameters are highly context-dependent and may be influenced by experimental conditions such as stimulation pattern, sampling frequency, and cellular heterogeneity.
 
-The results therefore demonstrate that the current model lacks global parameter robustness and cannot yet serve as a unified predictor of ERK activation dynamics across distinct stimulation regimes.
+The results therefore demonstrate that the current model lacks global parameter robustness and cannot yet serve as a unified predictor of ERK activation dynamics across distinct stimulation regimes. 
+The cause is not certain, but both a sub-optimal model architecture
+and a lack of sophistication in training regiment could be interesting targets for improvement.
 
 = Discussion
 
@@ -307,7 +311,11 @@ To circumvent this problem, two solutions were contemplated.
 1. An interpolation algorithm could have been used to synthetically create data points of the sampling rate we desire. This forces our new data points to inherit our assumptions about how the data is interpolated, which could introduce a systematic bias (as example, for linearity).
 2. A proxy metric for a total light energy of a light pulse for a datapoint is introduced instead of a "binary" baseline. This allows for more flexibility but at a cost of having to create a realistically-scaling function that works for all kinds of experiments and across different levels of magnitude of light stimulation duration.
 
-After theoretical evaluation of pros and const of both, a second solution strategy was picked, due to a better compatibility with the goal of having short training times. 
+After theoretical evaluation of pros and cons of both, a second solution strategy was picked, due to a better compatibility with the goal of having short training times. 
+Despite dealing with the hurdle at hand and enabling further steps, this resolution creates its own problems.
+With each experiment we add to our roster, one needs to manually implement its corresponding light-stimulation function, and what's more important, 
+one also needs to make sure the light functions from different experiments are compatible with each other - a consistent 
+formula for translating between experimental setup and computational representation is important to establish.
 
 == Parameter identifiability and model robustness
 
@@ -326,3 +334,11 @@ Improved identifiability could be achieved through joint fitting across many exp
 and experimental designs that specifically perturb correlated reactions.
 
 = Future work
+
+Future work should focus on improving both the robustness and applicability of the modeling framework.
+A global optimization stage should be introduced prior to local parameter fitting to ensure broader exploration of the parameter space and to reduce the risk of convergence to local minima.
+The modeling framework should also be extended to support multiple, interchangeable model structures, enabling systematic comparison of competing hypotheses and quantification of their relative explanatory power.
+Comprehensive sensitivity analyses will be required to identify parameters that most strongly influence system behavior and to guide model refinement.
+Ultimately, the developed model and accompanying optimization tools could be integrated into an automated experiment design pipeline, allowing for iterative selection of experimental conditions and stimulation patterns that maximize information gain and minimize parameter uncertainty.
+Additionally, tighter integration with the experimental setup — particularly through improved and standardized generation 
+of light-stimulation functions for each experiment could further enhance model fidelity.
