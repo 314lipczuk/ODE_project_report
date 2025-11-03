@@ -26,7 +26,7 @@ Different cell fates are linked to dynamics of the final node in the cascade, `E
 To understand how different dynamic patterns of their behavior arise, 
 a mechanistic model of this pathway was constructed using ordinary differential equations (ODEs).
 Experimental data was obtained from a series of experiments including fibroblast cells transfected with optogenetic receptor 
-tyrosine kinases (optoRTKs) constructs and an ERK-KTR reporter. The cells were stimulated with 
+tyrosine kinase (optoRTKs) constructs and an ERK-KTR reporter. The cells were stimulated with 
 different light patterns over the course of each experiment.
 Model parameters were estimated from this data, and cross-validation techniques were employed to evaluate the generalizability of fitted
 parameters.
@@ -84,7 +84,7 @@ Sustained and Ramp were incorporated as a means of providing cross-validation fo
 
 Finding the balance between simplicity and mechanistic accuracy is the key problem in model definition. 
 Too simple model results in non-relevant findings, since it fails to capture complexity of the problem.
-Too complex model is harder to operate, and is prone to fragile to comlexity explosions,
+Too complex model is harder to operate, and is prone to fragile to complexity explosions,
 parameter unidentifiability, and poor choice of starting condition leading to nonsensical results.\
 
 The chosen model starts at the level of RAS, and does not include the receptor layer. It treats light as a positive term in converting
@@ -174,7 +174,7 @@ Ordinary differential equations are a mathematical framework for describing the 
 (dependent) over another variable (independent). 
 Its simplest formulation is an expression that equates some mathematical expression to a
 derivative of our variable in question Y over the independent variable X. $ frac(d Y(x),d X) = f(y(x)) $ 
-A solution to a differential equation is usually understood as obtaining a $Y(X)$ form, also called an _general solution_ @fey_modeling_ode.
+A solution to a differential equation is usually understood as obtaining a $Y(X)$ form, also called a _general solution_ @fey_modeling_ode.
 General solutions can be obtained using an analytical solving process, the difficulty of which is heavily 
 dependent on the specific problem being solved. An often encountered problem with analytical solution approach 
 is a problem that contains complex, nonlinearly coupled equations, which do not yield easily to this method. 
@@ -184,7 +184,7 @@ an ODE system by evaluating the equations sequentially at a consecutive $Delta x
 This method, while providing a weaker form of solution, can deal with harder problems,
 including those that describe complex, nonlinear systems.
 \
-A load-bearing assumptions when picking up an ODEs for modeling dynamics of intracellural concentrations is that within the cell,
+A load-bearing assumptions when picking up an ODEs for modeling dynamics of intracellular concentrations is that within the cell,
 the system is perfectly mixed (no spatial gradients of concentration occur). This assumption lets us avoid the complexities 
 stemming from tracking chemical gradients within the cell based on position within it, which would be 
 impossible to model using just an ODE system, as multiple additional independent variables arise from having to incorporate
@@ -248,7 +248,7 @@ however during model validation, all training runs started with the same paramet
 
 == Parameter estimation from a single experiment
 The preliminary fits over single experiments captures each individual dynamic response quite well in the broad strokes. 
-However, a noticable pattern across these peaks is that the model rarely captures quantitative metrix such a $c_"max"$, 
+However, a noticable pattern across these peaks is that the model rarely captures quantitative metrics such a $c_"max"$, 
 cannot account for changes in baseline, and has trouble accurately fitting scenarios with wide range of stimulation conditions.
 
 #figure(caption: [Results of 3 single-experiment fits.])[
@@ -268,7 +268,7 @@ cannot account for changes in baseline, and has trouble accurately fitting scena
 
 == Cross-validation
 
-#figure(caption: [Results of 3-fold cross validation. There is observable lack of generalization across between experiments. Model trained on transient and ramp experiments and tested on sustained shows the best results in that it reproduces the shape of the activation we see in the data. However, the quantitative values outputted by the model are consistently overshooting the experimental observations. Other folds of cross-validation fail to reproduce the ERK activation dynamics at all. ])[
+#figure(caption: [Results of 3-fold cross validation. There is observable lack of generalization between experiments. Model trained on transient and ramp experiments and tested on sustained shows the best results in that it reproduces the shape of the activation we see in the data. However, the quantitative values outputted by the model are consistently overshooting the experimental observations. Other folds of cross-validation fail to reproduce the ERK activation dynamics at all. ])[
 #grid(
   columns: 2,
   rows: 2,
