@@ -230,9 +230,17 @@ namely `minimize` and `solve_ivp` to optimize loss function and to solve a numer
 The general scheme involved minimizing residual sum of squares for the data given 
 in an experiment across all the groups in a given experiment.
 
-Codebase is structured mainly around a `Model` class that implements model definition,
+Codebase was structured around a `Model` class that implements model definition,
 parameter estimation and simulating a trajectory given a stimulation pattern, parameters, and the initial condition.
-Each experiment has its own light-stimulation function and a function to read, filter, and normalize data.
+Each experiment has its own light-stimulation function and a function to read, filter, and normalize data. \
+Thus, to incorporate a new experiment into the model, one has to only implement `light_fn` and some kind of function 
+that will parse and return correctly shaped pd.dataframe object as experimental data.
+Convention here was to have 3 columns: `time`, `group`, and `y`. Additional columns can be incorporated, however `group` values must be unique across experiments.\
+Functionality to provide alternative models was also implemented: all models need to supply a `model_definition` function that 
+provides symbolic differential equations, and a list of parameters, constants and state variables.
+
+During development, simulation tool was used to 'hand-pick' a solid starting points for parameter initial values,
+however during model validation, all training runs started with the same parameter set randomly sampled from a uniform distribution $UU_[ 0 , 2 ]$.
 
 = Results 
 
@@ -263,8 +271,8 @@ cannot account for changes in baseline, and has trouble accurately fitting scena
   columns: 2,
   rows: 2,
   gutter: 1em,
-    image("static/cv_fit_sustained_1.png", width: 100%),
-    image("static/cv_fit_ramp_1.png", width: 100%),
+    image("static/cv_fit_sustained_1.png", width: 80%),
+    image("static/cv_fit_ramp_1.png", width: 80%),
     grid.cell(colspan:2)[
       #align(center)[
         #image("static/cv_fit_transient_1.png", width: 50%)
@@ -300,5 +308,21 @@ To circumvent this problem, two solutions were contemplated.
 2. A proxy metric for a total light energy of a light pulse for a datapoint is introduced instead of a "binary" baseline. This allows for more flexibility but at a cost of having to create a realistically-scaling function that works for all kinds of experiments and across different levels of magnitude of light stimulation duration.
 
 After theoretical evaluation of pros and const of both, a second solution strategy was picked, due to a better compatibility with the goal of having short training times. 
+
+== Parameter identifiability and model robustness
+
+The limited generalizability of the model likely reflects issues of parameter identifiability - a concept where 
+even when a model accurately reproduces individual experimental datasets, its parameters can not be uniquely determined @param_ident.
+
+This arises from strong correlations between parameters that produce elongated,
+flat regions in the residual landscape - making it harder for
+fitting algorithm to traverse and find optimal solution.
+
+Only a few parameter combinations (“stiff directions”) are well constrained by the data,
+while the majority (“sloppy directions”) remain weakly identifiable. Consequently, optimization may converge
+to different parameter values without affecting model fit quality.
+
+Improved identifiability could be achieved through joint fitting across many experiments, inclusion of prior information,
+and experimental designs that specifically perturb correlated reactions.
 
 = Future work
