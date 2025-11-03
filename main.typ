@@ -6,7 +6,7 @@
 #show: ilm.with(
   title: [Research project report:\ Modelling MAPK/ERK pathway using Ordinary Differential Equations],
   author: "Przemysław Pilipczuk",
-  date: datetime(year: 2025, month: 10, day: 13),
+  date: datetime(year: 2025, month: 11, day: 1),
   abstract: [
     A mechanistic model of MAPK/ERK signaling pathway was constructed using Ordinary Differential Equations and 
     implemented into a pipeline for simulating and fitting parameters against experimental data. 
@@ -340,5 +340,5 @@ A global optimization stage should be introduced prior to local parameter fittin
 The modeling framework should also be extended to support multiple, interchangeable model structures, enabling systematic comparison of competing hypotheses and quantification of their relative explanatory power.
 Comprehensive sensitivity analyses will be required to identify parameters that most strongly influence system behavior and to guide model refinement.
 Ultimately, the developed model and accompanying optimization tools could be integrated into an automated experiment design pipeline, allowing for iterative selection of experimental conditions and stimulation patterns that maximize information gain and minimize parameter uncertainty.
-Additionally, tighter integration with the experimental setup — particularly through improved and standardized generation 
-of light-stimulation functions for each experiment could further enhance model fidelity.
+Additionally, tighter integration with the experimental setup (improved and standardized generation 
+of light-stimulation functions for each experiment) could further enhance model fidelity.
